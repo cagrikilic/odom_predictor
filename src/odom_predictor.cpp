@@ -8,6 +8,7 @@ OdomPredictor::OdomPredictor(const ros::NodeHandle& nh,
       have_odom_(false),
       have_bias_(false) {
   nh_private.param("max_imu_queue_length", max_imu_queue_length_, 1000);
+  nh_private.param("publish_tf", publish_tf_, false);
 
   constexpr size_t kROSQueueLength = 100;
   imu_sub_ =
@@ -16,7 +17,6 @@ OdomPredictor::OdomPredictor(const ros::NodeHandle& nh,
                                 &OdomPredictor::imuBiasCallback, this);
   odometry_sub_ = nh_.subscribe("odometry", kROSQueueLength,
                                 &OdomPredictor::odometryCallback, this);
-
   odom_pub_ = nh_private_.advertise<nav_msgs::Odometry>("predicted_odometry",
                                                         kROSQueueLength);
   transform_pub_ = nh_private_.advertise<geometry_msgs::TransformStamped>(
@@ -100,7 +100,7 @@ void OdomPredictor::imuCallback(const sensor_msgs::ImuConstPtr& msg) {
   }
 
   publishOdometry();
-  publishTF();
+  if(publish_tf_) { publishTF(); }
   ++seq_;
 }
 

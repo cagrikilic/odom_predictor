@@ -44,6 +44,7 @@ class OdomPredictor {
   ros::Publisher odom_pub_;
   ros::Publisher transform_pub_;
 
+  bool publish_tf_;
   tf::TransformBroadcaster br_;
 
   int max_imu_queue_length_;
